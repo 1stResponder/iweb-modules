@@ -1,0 +1,57 @@
+/**
+ * Copyright (c) 2008-2015, Massachusetts Institute of Technology (MIT)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+.nics-sprite { background: url("images/drawmenu/nics-sprites.png") no-repeat; }
+.sprite-hand{ background-position: -154px -440px !important; }
+.sprite-selection-select{ background-position: -434px -70px !important; } 
+.sprite-magnifier-left{ background-position: -238px -816px !important; }
+.sprite-eraser{ background-position: -70px -1734px !important; }
+.sprite-paint-brush{ background-position: -238px -1677px !important; }
+.sprite-layers-stack{ background-position: -242px -288px !important; }
+.sprite-undo_dis{ background-position: -438px -1067px !important; }
+.sprite-undo{ background-position: -438px -993px !important; }
+.sprite-redo{ background-position: -340px -362px !important; } 
+.sprite-redo_dis{ background-position: -340px -436px !important; }
+.sprite-copy{ background-position: -74px -880px !important; } 
+.sprite-paste{ background-position: -242px -1744px !important; }
+.sprite-ui-label{ background-position: -434px -923px !important;}
+.sprite-marker{ background-position: -238px -882px !important; }  
+.sprite-layer-shape-polygon{ background-position: -238px -218px !important;}
+.sprite-arrow-circle{ background-position: 4px -1698px !important; }
+.sprite-pencil{ background-position: -238px -1814px !important; } 
+.sprite-pencil_thin { background-position:-538px -630px !important; }
+.sprite-pencil_med { background-position:-538px -558px !important; }
+.sprite-pencil_thick { background-position:-538px -705px !important; }
+.sprite-pencil_fade{ background-position: -238px -1880px !important; }
+.sprite-pencil_fade_16{ background-position: -242px -1884px !important; }
+.sprite-ruler-crop{ background-position: -336px -1394px !important; }  
+.sprite-ruler2{ background-position: -336px -1526px !important; } 
+.sprite-sm-a{ background-position: -438px -129px !important; width: 24px; height: 24px; } 
+.sprite-med-a{ background-position: -242px -946px !important; width: 24px; height: 24px; }
+.sprite-big-a{ background-position: -74px 0 !important; width: 24px; height: 24px; }
