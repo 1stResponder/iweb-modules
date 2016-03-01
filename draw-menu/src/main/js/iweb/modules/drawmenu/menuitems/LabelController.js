@@ -27,54 +27,60 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./LabelWindow"],
-		function(Core, MapModule, Interactions, LabelWindow) {
+define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./LabelWindow", "ol"],
+		function(Core, MapModule, Interactions, LabelWindow, ol) {
     return Ext.define("drawmenu.LabelController", {
        extend: 'Ext.app.ViewController',
        alias: "controller.drawmenu.labelbutton",
-       
+
        featureInProgress: null,
        drawingColor: null,
-       
+
        init: function() {
-    	   // don't want to allow user direct user toggling 
+    	   // don't want to allow user direct user toggling
     	   this.getView().enableToggle = false;
-    	   
+
     	   MapModule.getMapStyle().addStyleFunction(this.labelStyleFunction.bind(this));
-    	   
+
     	  this.drawingColor = Core.Ext.Map.getDrawingColor();
     	  Core.EventManager.addListener("map-color-change", this.onMapColorChange.bind(this));
        },
 
        onClick: function(btn) {
-    	   
+
     	   if (!this.window) {
         	   this.window = new LabelWindow();
-        	   this.window.on("label-set", this.windowLabelSet, this);    		   
+        	   this.window.on("label-set", this.windowLabelSet, this);
     	   }
     	   this.window.show();
        },
-       
+
        windowLabelSet: function(window, text, size) {
     	   this.getView().toggle(true);
-    	   
+
     	   var interaction = this.buildLabelInteraction(text, size);
     	   Core.Ext.Map.setInteractions([interaction]);
        },
-       
-       
+
+
        buildLabelInteraction: function (text, labelSize) {
+				//create temporary style for drawing
+				var styleFunction = function(feature, resolution){
+					this.onDrawStart(text, labelSize, feature);
+					return this.labelStyleFunction(feature, resolution, false);
+				}.bind(this);
+
     	   var interaction = Interactions.drawPoint(
-    			   Core.Ext.Map.getSource(), Core.Ext.Map.getStyle);
-    	   
+    			   Core.Ext.Map.getSource(), styleFunction);
+
     	   interaction.on("drawstart", this.onDrawStart.bind(this, text, labelSize));
     	   interaction.on("drawend", this.onDrawEnd.bind(this));
     	   return interaction;
        },
-       
+
        onDrawStart: function(text, labelSize, drawEvent) {
-    	   
-    	   var feature = drawEvent.feature;
+
+				var feature = drawEvent.feature || drawEvent;
 		   feature.setProperties({
 				type: 'label',
 				labelText: text,
@@ -83,49 +89,49 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./Label
 		   });
 		   this.featureInProgress = feature;
        },
-       
+
        onDrawEnd: function (drawEvent) {
     	   this.featureInProgress = null;
        },
-       
+
        onMapColorChange: function(eventName, color) {
-    	   this.drawingColor = color; 
-    		   
+    	   this.drawingColor = color;
+
     	   //if there is feature drawing in progress, update it immediately
     	   if(this.featureInProgress){
     		   this.featureInProgress.set("fillColor", color);
     	   }
        },
-       
+
 		labelStyleFunction: function (feature, resolution, selected) {
 			if (feature.get('type') !== 'label') {
 				return;
 			}
-			
+
 			var style = this.buildDefaultLabelStyle();
-			
+
 			var labelText = feature.get("labelText"),
 				labelSize = feature.get("labelSize"),
 				rotation = feature.get("rotation") || 0,
 				fillColor = feature.get("fillColor"),
 				strokeColor = "white";
-			
+
 			if (selected) {
 				fillColor = "aqua";
 				strokeColor = "black";
 			}
-			
+
 			var textStyle = style.getText();
 			textStyle.setText(labelText);
 			textStyle.setRotation(rotation);
 			textStyle.setFont(labelSize + 'px arial');
-			
+
 			textStyle.getFill().setColor(fillColor);
 			textStyle.getStroke().setColor(strokeColor);
-			
+
 			return [style];
 		},
-		
+
 		buildDefaultLabelStyle: function() {
 			return new ol.style.Style({
 				text: new ol.style.Text({
@@ -143,7 +149,7 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./Label
 				})
 			});
 		}
-       
+
     });
 
 });

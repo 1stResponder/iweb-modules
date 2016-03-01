@@ -30,7 +30,7 @@
 define(['ol'], function(ol) {
 		
     return {
-    	selectBox: function(source, selectedCollection) {
+    	selectBox: function(map, selectedCollection) {
 
     		var lastMapBrowserEvent = null;
     		var box = new ol.interaction.DragBox({
@@ -38,12 +38,7 @@ define(['ol'], function(ol) {
                 	  //cache last map event for handling later
                 	  lastMapBrowserEvent = mapBrowserEvent;
                 	  return true;
-                  },
-    			  style: new ol.style.Style({
-    			    stroke: new ol.style.Stroke({
-    			      color: [0, 0, 255, 1]
-    			    })
-    			  })
+                  }
     		});
     		
             box.on("boxend", function(e) {
@@ -52,14 +47,22 @@ define(['ol'], function(ol) {
                 }
 
                 var extent = box.getGeometry().getExtent(),
-                    selectedArray = selectedCollection.getArray(), 
-                    toSelect = [];        
-                source.forEachFeatureIntersectingExtent(extent, function(feature) {
-                    if (-1 === selectedArray.indexOf(feature)) {
+                    selectedArray = selectedCollection.getArray(),
+                    toSelect = [];
+
+                //check each layer source for intersecting features
+                map.getLayers().forEach(function(layer){
+                  var source = layer.getSource();
+                  if(layer.getVisible() && source.forEachFeatureIntersectingExtent) {
+                    source.forEachFeatureIntersectingExtent(extent,
+                    function(feature) {
+                      if (-1 === selectedArray.indexOf(feature)) {
                         toSelect.push(feature);
-                    } else {
+                      } else {
                         selectedCollection.remove(feature);
-                    }
+                      }
+                    });
+                  }
                 });
                 toSelect.forEach(selectedCollection.push, selectedCollection);
             });
@@ -105,7 +108,7 @@ define(['ol'], function(ol) {
     		var select = new ol.interaction.Select({
     		    style: selectStyle,
     			filter: function (feature, layer) {
-    				return source.getFeatureById(feature.getId()) != null;
+    				return source.getFeatureById(feature.getId()) !== null;
     			}
     		});
             var selectedCollection = select.getFeatures();
@@ -116,12 +119,7 @@ define(['ol'], function(ol) {
                 	  //cache last map event for handling later
                 	  lastMapBrowserEvent = mapBrowserEvent;
                 	  return true;
-                  },
-    			  style: new ol.style.Style({
-    			    stroke: new ol.style.Stroke({
-    			      color: [0, 0, 255, 1]
-    			    })
-    			  })
+                  }
     		});
 
             //when a box is drawn, add any intersecting features to selection

@@ -41,7 +41,7 @@ define(["iweb/CoreModule"], function(Core) {
        },
        
        onCopyClick: function() {
-    	   this.clipboard = Core.Ext.Map.getSelection().getArray().slice();
+    	   this.clipboard = Core.Ext.Map.getEditableSelection().getArray().slice();
     	   this.disablePaste(this.readOnly);
        },
        
@@ -61,7 +61,9 @@ define(["iweb/CoreModule"], function(Core) {
        },
        
        onMapSelectionChange: function(eventName, selection) {
-    	   this.lookupReference("copy").setDisabled(!selection.length);
+         //use the editable selection rather than passed selection
+         var editableSelection = Core.Ext.Map.getEditableSelection().getArray();
+    	   this.lookupReference("copy").setDisabled(!editableSelection.length);
        },
        
        onMapSourceSet: function(eventName, oldSource, newSource){

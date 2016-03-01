@@ -29,7 +29,7 @@
  */
 requirejs.config({
 	paths: {
-		'ol': 'lib/ol/ol-debug'
+		'ol': 'lib/ol/ol'
 	}
 });
 

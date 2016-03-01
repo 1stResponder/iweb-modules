@@ -35,23 +35,55 @@ define(['ext', 'ol', 'iweb/CoreModule'], function(Ext, ol, Core){
 		},
 		
 		render: function(container, feature) {
-			container.add( new Ext.form.field.Display({
-				fieldLabel: 'Type',
-				value: feature.get('type')
-			}));
+		
+			if(feature.get('type') == 'incident'){
 			
-			var desc = feature.get('description');
-			if (desc) {
-				var desc = new Ext.form.field.Display({
-					fieldLabel: 'Description',
-					labelAlign: 'top',
-					value: desc
-				});
-				container.add( desc );
+				container.add( new Ext.form.field.Display({
+					fieldLabel: 'Incident Name',
+					value: feature.get('incidentname')
+				}));
 				
-				//make all (non-mailto) links open in a new window
-				desc.getEl().select("a:not([href^='mailto'])").set({"target" : "_blank"});
+				var desc = feature.get('description');
+				
+				if(desc) {
+					container.add( new Ext.form.field.Display({
+						fieldLabel: 'Description',
+						value: desc
+					}));
+				}
+				
 			}
+			else{
+				
+				var type = feature.get('type');		
+				if(type) {
+					container.add( new Ext.form.field.Display({
+						fieldLabel: 'Type',
+						value: type
+					}));
+				}
+				
+				var sym = feature.get('sym');		
+				if(sym) {
+					container.add( new Ext.form.field.Display({
+						fieldLabel: 'Waypoint Symbol',
+						value: sym
+					}));
+				}
+				
+				var desc = feature.get('description');
+				if (desc) {
+					var desc = new Ext.form.field.Display({
+						fieldLabel: 'Description',
+						labelAlign: 'top',
+						value: desc
+					});
+					container.add( desc );
+					
+					//make all (non-mailto) links open in a new window
+					desc.getEl().select("a:not([href^='mailto'])").set({"target" : "_blank"});
+				}
+			}	
 			return true;
 		}
 		

@@ -60,11 +60,6 @@ define(['iweb/CoreModule'], function(Core) {
           reference: "select",
           toggleHandler: "onSelectClick"
        },{
-          iconCls: 'sprite-arrow-circle',
-          tooltip: "Rotate",
-          reference: "rotate",
-          toggleHandler: "onRotateClick"
-       },{
           iconCls: 'sprite-magnifier-left',
           tooltip: "Zoom Box",
           reference: "zoom",

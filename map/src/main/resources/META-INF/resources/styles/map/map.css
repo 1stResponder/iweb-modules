@@ -38,6 +38,15 @@
 	height: initial;
 }
 
+.ol-dragzoom, .ol-dragbox {
+  border: 3px solid rgba(0,0,255,0.8);
+  background-color: rgba(0,0,255,0.1);
+}
+
+.ol-dragbox {
+  border-style: dashed;
+}
+
 .ol-popup {
     display: none;
     position: absolute;
@@ -81,7 +90,7 @@
   .ol-popup-closer:after {
     content: "x";
   }
-  
+
   .zoom-level-indicator {
     top: 6px;
     left: 36px;
@@ -102,7 +111,7 @@
     border-radius: 2px;
 }
 
-.zoom-level-indicator .indicator { 
+.zoom-level-indicator .indicator {
     line-height: 0.9em;
     font-size: 2.0em;
     font-weight: 700;

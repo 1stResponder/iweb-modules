@@ -44,6 +44,15 @@ public class Config {
 	
 	private String ROUTING_KEY = "iweb.#";
 	private String EXCHANGE_NAME = "iweb.amq.topic";
+
+    public static final String RABBIT_HOSTNAME_KEY = "rabbitmq.hostname";
+    public static final String RABBIT_USERNAME_KEY = "rabbitmq.username";
+    public static final String RABBIT_USERPWD_KEY = "rabbitmq.userpwd";
+    public static final String RABBIT_EXCHANGENAME_KEY = "rabbitmq.exchange.name";
+    public static final String RABBIT_MAX_CONN_TRIES = "rabbitmq.maxconntries";
+    public static final String RABBIT_FAILOVER_HOSTNAME = "rabbitmq.failover.hostname";
+    public static final String RABBIT_BINDING_KEYS = "rabbitmq.bindingkeys";
+    public static final String RABBIT_MSG_VERSION = "rabbitmq.msgver";
 	
 	// Lazy-initialization Holder class idiom.
 	private static class Holder {
@@ -66,7 +75,7 @@ public class Config {
 		CamelContext context = new DefaultCamelContext();
 		
 		//READ THESE FROM CONFIG
-		endpoint = context.getEndpoint("rabbitmq:localhost/exchange", RabbitMQEndpoint.class);
+		endpoint = context.getEndpoint("rabbitmq://localhost:5672/iweb.amq.topic", RabbitMQEndpoint.class);
 		endpoint.setUsername("guest");
 		endpoint.setPassword("guest");
 		endpoint.setExchangeType("topic");

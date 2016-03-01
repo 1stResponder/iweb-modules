@@ -29,7 +29,7 @@
  */
 requirejs.config({
         paths: {
-                'ext': 'lib/extjs/build/ext-all-debug',
+                'ext': 'lib/extjs/build/ext-all',
                 'ext-charts': 'lib/extjs/build/packages/sencha-charts/build/sencha-charts',
                 'jquery': 'lib/jquery-1.11.1.min',
                 'atmosphere': 'lib/atmosphere'

@@ -37,13 +37,14 @@
   <artifactId>iweb-modules</artifactId>
   <packaging>pom</packaging>
   <name>iWeb Modules Pom</name>
-  <version>6.1</version>
+  <version>6.1.1</version>
 
   <modules>
     <module>core</module>
     <module>core-view</module>
     <module>map</module>
     <module>draw-menu</module>
+    <module>geocode</module>
   </modules>
 
   <properties>
@@ -148,6 +149,11 @@
 	    <artifactId>camel-rabbitmq</artifactId>
 	    <version>2.12.5</version>
 	</dependency>
+        <dependency>
+            <groupId>edu.mit.ll.nics.common</groupId>
+            <artifactId>rabbitmq-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
       
       <!-- test dependencies -->
@@ -193,35 +199,18 @@
                             <xslt>XML_STYLE</xslt>
                         </mapping>
 
-                        <excludes>
-                            <!-- Some default excludes -->
-                            <exclude>**/*~</exclude>
-                            <exclude>**/*.jar</exclude>
-                            <exclude>**/*.zip</exclude>
-                            <exclude>**/*.tar*</exclude>
-                            <exclude>**/*.pdf</exclude>
-                            <exclude>**/*.jpg</exclude>
-                            <exclude>**/*.png</exclude>
-                            <exclude>**/*.gif</exclude>
-                            <exclude>**/*.ico</exclude>
-                            <exclude>**/*.bmp</exclude>
-                            <exclude>**/*.tif*</exclude>
-                            <exclude>**/*.cr2</exclude>
-                            <exclude>**/MANIFEST.MF</exclude>
-                            <exclude>**/.classpath</exclude>
-                            <exclude>**/.project</exclude>
-                            <exclude>**/.settings/**</exclude>
-                            <exclude>**/target/**</exclude>
-                            <exclude>**/test-output/**</exclude>
-						    <exclude>**/META-INF/services/**</exclude>
-                            <exclude>**/.git</exclude>
-                            <exclude>**/.gitignore</exclude>
-                            <exclude>**/.git/**</exclude>
-                            <exclude>**/*.log</exclude>
-                            <exclude>**/*.txt</exclude>
+                        <includes>
+                            <includes>**/src/**/*.java</includes>
+                            <includes>**/src/**/*.js</includes>
+                            <includes>**/src/**/*.css</includes>
+                            <includes>**/src/**/*.xml</includes>
+                        </includes>
 
+                        <excludes>
                             <!-- Project-specific excludes -->
-							<exclude>**/core/src/main/js/lib/**</exclude>
+                            <exclude>**/target/**</exclude>
+                            <exclude>**/src/main/js/lib/**</exclude>
+                            <exclude>**/map/ol.css</exclude>
                         </excludes>
                     </configuration>
                     <inherited>false</inherited>

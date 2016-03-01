@@ -37,7 +37,7 @@ define(["iweb/CoreModule", "./ColorController"], function(Core) {
 			
 			cls: 'color-btn',
 			scale: 'medium',
-			colspan: 2,
+			colspan: 3,
 			tooltip: 'Color',
 			arrowAlign: 'bottom',
 			

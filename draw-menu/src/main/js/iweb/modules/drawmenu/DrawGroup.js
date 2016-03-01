@@ -28,16 +28,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define(["iweb/CoreModule", "./menuitems/MarkerButton", "./menuitems/LabelButton",
-        "./menuitems/ShapeButton", "./menuitems/LineButton", "./menuitems/FireLineButton",
-        "./menuitems/ColorButton"],
-        function(Core, MarkerButton, LabelButton, ShapeButton,
-        		LineButton, FireLineButton, ColorButton) {
+        "./menuitems/ShapeButton", "./menuitems/LineButton", "./menuitems/MeasureButton",
+        "./menuitems/RotateButton", "./menuitems/FireLineButton", "./menuitems/ColorButton"],
+        function(Core, MarkerButton, LabelButton, ShapeButton, LineButton,
+          MeasureButton, RotateButton, FireLineButton, ColorButton) {
 	
     return Ext.define(null, {
        extend: 'Ext.container.ButtonGroup',
        
        frame: false,
-       columns :2,
+       columns: 3,
        
        defaults: {
           toggleGroup: "drawGroup",
@@ -49,8 +49,10 @@ define(["iweb/CoreModule", "./menuitems/MarkerButton", "./menuitems/LabelButton"
     	   
     	   this.add( new MarkerButton(this.defaults) );
     	   this.add( new LabelButton(this.defaults) );
+    	   this.add( new RotateButton(this.defaults) );
     	   this.add( new ShapeButton(this.defaults) );
     	   this.add( new LineButton(this.defaults) );
+    	   this.add( new MeasureButton(this.defaults) );
     	   this.add( new FireLineButton(this.defaults) );
     	   this.add( new ColorButton(this.defaults) );
        }

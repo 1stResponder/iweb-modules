@@ -39,6 +39,7 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 			this.container = new Ext.panel.Panel({
 				title: 'Feature Details',
 				width: 400,
+				componentCls:'form-feature-detail',
 				renderTo: Ext.getBody()
 			});
 			this.addCloseTool();
@@ -52,12 +53,17 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 			//
 			Core.EventManager.addListener("map-view-click", this.onMapViewClick.bind(this));
 			Core.EventManager.addListener("map-source-set", this.onMapSourceSet.bind(this));
+			Core.EventManager.addListener("map-window-clear", this.onMapWindowClear.bind(this));
 			
 			this.bufferedRender = Ext.Function.createBuffered(this.render, 100, this);
 		},
 		
 		addRenderer: function(renderer) {
 			this.renderers.push(renderer);
+		},
+		
+		onMapWindowClear: function(evt) {
+			this.cleanup();
 		},
 		
 		onWindowClose: function() {

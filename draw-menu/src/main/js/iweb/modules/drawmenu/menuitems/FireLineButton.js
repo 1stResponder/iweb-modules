@@ -38,7 +38,7 @@ define(["iweb/CoreModule", "./FireLineController"], function(Core) {
 			scale: 'medium',
 			arrowAlign: 'bottom',
 			menuAlign: 't-b?',
-			colspan: 2,
+			colspan: 3,
 
 			style: { width: '100%'},
 			
@@ -99,22 +99,19 @@ define(["iweb/CoreModule", "./FireLineController"], function(Core) {
 					tooltip: "Completed Dozer Line",
 					icon: "images/drawmenu/completed-dozer-line.png",
 					reference: "completedDozer",
-					handler: "onCompletedDozerClick",
-					hidden: true
+					handler: "onCompletedDozerClick"
 				},{
 					text: "Proposed Dozer Line",
 					tooltip: "Proposed Dozer Line",
 					icon: "images/drawmenu/proposed-dozer-line.png",
 					reference: "proposedDozer",
-					handler: "onProposedDozerClick",
-					hidden: true
+					handler: "onProposedDozerClick"
 				},{
 					text: "Uncontrolled Fire Edge Line",
 					tooltip: "Uncontrolled Fire Edge Line",
 					icon: "images/drawmenu/fire-edge-line.png",
 					reference: "fireEdge",
-					handler: "onFireEdgeClick",
-					hidden: true
+					handler: "onFireEdgeClick"
 				}]
 			}
 	       

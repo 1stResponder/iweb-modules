@@ -87,28 +87,12 @@ define(["iweb/CoreModule", "./Interactions", "./DrawGroup"], function(Core, Inte
        onSelectClick: function(btn, pressed) {
     	   if (!pressed) return;
     	   
-    	   var source = Core.Ext.Map.getSource();
+    	   var map = Core.Ext.Map.getMap();
     	   var selectedCollection = Core.Ext.Map.getSelection();
            
     	   var defaults = Core.Ext.Map.getDefaultInteractions();
-    	   var actions = Interactions.selectBox(source, selectedCollection);
-    	   Core.Ext.Map.setInteractions(actions.concat(defaults));    	   
-       },
-       
-       onRotateClick: function(btn, pressed) {
-    	   if (!pressed) return;
-    	   
-    	   var style = Core.Ext.Map.getSelectStyle;
-    	   var select = Core.Ext.Map.getSelectInteraction();
-    	   var selectedCollection = Core.Ext.Map.getEditableSelection();
-    	   var actions = Interactions.rotate(selectedCollection, style, function(feature, angle){
-    		   var type = feature.get('type');
-    		   if (type == "label" || type == "marker") {
-    			   var rotation = feature.get("rotation") || 0;
-    			   feature.set("rotation", rotation - angle);
-    		   }
-    	   });
-    	   Core.Ext.Map.setInteractions([select].concat(actions));
+    	   var actions = Interactions.selectBox(map, selectedCollection);
+    	   Core.Ext.Map.setInteractions(actions.concat(defaults));
        },
        
        onZoomClick: function(btn, pressed) {

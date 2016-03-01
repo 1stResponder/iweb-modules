@@ -29,6 +29,8 @@
  */
 package edu.mit.ll.iweb.websocket;
 
+import edu.mit.ll.nics.common.rabbitmq.RabbitFactory;
+import edu.mit.ll.nics.common.rabbitmq.RabbitPubSubProducer;
 import org.atmosphere.cpr.AtmosphereHandler;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -117,6 +119,7 @@ public class Mediator implements AtmosphereHandler {
 
 	private DefaultCamelContext context;
 	private ProducerTemplate producerTemp;
+    private RabbitPubSubProducer rabbitProducer;
 
 	private final ObjectWriter objectWriter;
 	private final Client jerseyClient;
@@ -277,8 +280,7 @@ public class Mediator implements AtmosphereHandler {
 
 	/**
 	 * Return the producer template used to publish messages
-	 * 
-	 * @param request
+	 *
 	 * @return
 	 */
 	private ProducerTemplate getPublisher() {
@@ -287,6 +289,20 @@ public class Mediator implements AtmosphereHandler {
 		}
 		return this.producerTemp;
 	}
+
+    private RabbitPubSubProducer getRabbitProducer() throws IOException
+    {
+        if (rabbitProducer == null)
+        {
+            rabbitProducer = RabbitFactory.makeRabbitPubSubProducer(
+                    Config.getInstance().getConfiguration().getString(Config.RABBIT_HOSTNAME_KEY),
+                    Config.getInstance().getConfiguration().getString(Config.RABBIT_EXCHANGENAME_KEY),
+                    Config.getInstance().getConfiguration().getString(Config.RABBIT_USERNAME_KEY),
+                    Config.getInstance().getConfiguration().getString(Config.RABBIT_USERPWD_KEY));
+        }
+
+        return rabbitProducer;
+    }
 
 	/**
 	 * Return array of subscribed topics for this request
@@ -376,9 +392,16 @@ public class Mediator implements AtmosphereHandler {
 	private ResponseMessage publish(String topic, String message) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			this.getPublisher().sendBodyAndHeader(
-					Config.getInstance().getRabbitMQEndpoint(), message,
-					RabbitMQConstants.ROUTING_KEY, topic);
+            logger.info("in Publish method");
+//            logger.info("Rabbit endpoint: " + Config.getInstance().getRabbitMQEndpoint().toString());
+
+            getRabbitProducer().produce(topic, message);
+
+//            Config.getInstance().getRabbitMQEndpoint().getEndpointUri();
+//            this.getPublisher().sendBody(
+//                    "rabbitmq://localhost:5672/iweb.amq.topic?exchangeType=topic&password=guest&routingKey=iweb.nics.email.alert&username=guest", message);
+            logger.info("Publishing on topic: " + topic);
+            logger.info("Publishing message: " + message);
 			responseMessage.setSuccessMessage(SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();

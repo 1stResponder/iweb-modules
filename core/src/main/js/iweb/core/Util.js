@@ -27,10 +27,66 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-define([], function() {
+define(["jquery"], function(jQuery) {
     "use strict";
 
     return {
+        invalidInput: "Invalid Input",
+        safeString: new RegExp('[a-zA-Z0-9&_ !,@#$%*()?{}+-\\/\';:"|]*'),
+
+        matchSafeString: function(input)
+        {
+            if(input != ""){
+                var result = input.match(this.safeString);
+                if ( result.length != 1 || result[0] == "" || result[0] != input ){
+                    return this.invalidInput;
+                }else{
+                    return result[0];
+                }
+            }else{
+                return input;
+            }
+        },
+
+        getValidInput: function(input)
+        {
+            var inputStr = input + ""; //make string
+            var inputArr = inputStr.split('\n');
+            for(var i=0; i<inputArr.length; i++){
+                if(this.matchSafeString(inputArr[i]) === this.invalidInput){
+                    return this.invalidInput;
+                }
+            }
+            return input;
+        },
+
+        isValidInput: function(input)
+        {
+            if(this.getValidInput(input) == this.invalidInput){
+                return false;
+            }
+            return true;
+        },
+
+        getBrowserVersion: function()
+        {
+            if (navigator && navigator.userAgent)
+            {
+                var ua = navigator.userAgent;
+                ua = ua.toLowerCase();
+
+                var match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
+                    /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
+                    /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
+                    /(msie) ([\w.]+)/.exec( ua ) ||
+                    ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
+                    [];
+
+                return match[ 1 ] || "";
+            }
+
+            return "";
+        },
 
         /**
          * Function: getUTCTimestamp
