@@ -43,9 +43,9 @@ public class Config {
 	private RabbitMQEndpoint endpoint;
 	
 	private String ROUTING_KEY = "iweb.#";
-	private String EXCHANGE_NAME = "iweb.amq.topic";
 
     public static final String RABBIT_HOSTNAME_KEY = "rabbitmq.hostname";
+    public static final String RABBIT_PORT_KEY = "rabbitmq.port";
     public static final String RABBIT_USERNAME_KEY = "rabbitmq.username";
     public static final String RABBIT_USERPWD_KEY = "rabbitmq.userpwd";
     public static final String RABBIT_EXCHANGENAME_KEY = "rabbitmq.exchange.name";
@@ -72,16 +72,23 @@ public class Config {
 	}
 	
 	private void initRabbitEndpoint(){
-		CamelContext context = new DefaultCamelContext();
+		Configuration config = getConfiguration();
 		
-		//READ THESE FROM CONFIG
-		endpoint = context.getEndpoint("rabbitmq://localhost:5672/iweb.amq.topic", RabbitMQEndpoint.class);
-		endpoint.setUsername("guest");
-		endpoint.setPassword("guest");
+		String endpointUrl = new StringBuilder("rabbitmq://")
+			.append(config.getString(RABBIT_HOSTNAME_KEY))
+			.append(":")
+			.append(config.getInt(RABBIT_PORT_KEY, 5672))
+			.append("/")
+			.append(config.getString(RABBIT_EXCHANGENAME_KEY))
+			.toString();
+		
+		CamelContext context = new DefaultCamelContext();
+		endpoint = context.getEndpoint(endpointUrl, RabbitMQEndpoint.class);
+		endpoint.setUsername(config.getString(RABBIT_USERNAME_KEY));
+		endpoint.setPassword(config.getString(RABBIT_USERPWD_KEY));
 		endpoint.setExchangeType("topic");
 		endpoint.setRoutingKey(ROUTING_KEY);
-		endpoint.setExchangeName(EXCHANGE_NAME);
-		/******************************************/
+		endpoint.setExchangeName(config.getString(RABBIT_EXCHANGENAME_KEY));
 	}
 	
 	protected Config() {
