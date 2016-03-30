@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2015, Massachusetts Institute of Technology (MIT)
+ * Copyright (c) 2008-2016, Massachusetts Institute of Technology (MIT)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -292,9 +292,18 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 						feature.get("dashStyle") === 'fire-edge-line')) {
 				return;
 			}
-			
+			var lineColor = 'rgb(255,0,0)';
 			var styles = this.lineToSegmentPoints(
-				feature.getGeometry(), 'L', 9 * resolution, 'rgb(255,0,0)');
+				feature.getGeometry(), '|', 9 * resolution, {
+					color: lineColor,
+					font: '15px sans-serif',
+					textBaseline: 'ideographic'
+				});
+			
+			var lineStyle = this.buildDefaultLineStyle();
+			lineStyle.getStroke().setColor(lineColor);
+			lineStyle.getStroke().setWidth(3);
+			styles.push(lineStyle);
 			
 			var color = selected ? 'rgba(0,255,255,0.5)' : 'rgba(0,255,255,0.01)';
 			styles.push(new ol.style.Style({
@@ -315,13 +324,15 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			});
 		},
 		
-		lineToSegmentPoints: function(linestring, text, segmentLength, color) {
+		lineToSegmentPoints: function(linestring, text, segmentLength, options) {
 			var map = MapModule.getMap(),
 					extent = map.getView().calculateExtent(map.getSize()),
 					coords = linestring.getCoordinates(),
 					styles = [];
 					
-			color = color || 'black';
+			color = options && options.color || 'black';
+			font = options && options.font || 'bold 18px sans-serif';
+			textBaseline = options && options.textBaseline || 'middle';
 			
 			if (coords.length > 1) {
 				//preprocess our line, filtering non-visible segments
@@ -368,11 +379,11 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 								rotation: -rotation,
 								text: text,
 								textAlign: 'center',
-								textBaseline: 'middle',
+								textBaseline: textBaseline,
 								fill: new ol.style.Fill({
 									color: color
 								}),
-								font: 'bold 18px sans-serif'
+								font: font
 							})
 						}));
 						accumulatedLength = 0 ;

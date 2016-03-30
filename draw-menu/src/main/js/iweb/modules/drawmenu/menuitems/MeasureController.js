@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2015, Massachusetts Institute of Technology (MIT)
+ * Copyright (c) 2008-2016, Massachusetts Institute of Technology (MIT)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -111,7 +111,10 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			feature.setProperties({
 				type: 'measure'
 			});
-			feature.setStyle(this.getDefaultMeasureStyle());
+			feature.setStyle([
+				this.getDefaultMeasureStyle(),
+				this.getDefaultMeasureTextStyle()
+			]);
 			feature.on("change",
 				this.onFeatureChange, this);
 		},
@@ -121,79 +124,112 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			feature.un("change",
 				this.onFeatureChange, this);
 
-			var style = feature.getStyle(),
-					textFill = style.getText().getFill(),
-					strokeStyle = style.getStroke();
+			var styles = feature.getStyle(),
+					strokeStyle = styles[0].getStroke(),
+					textFill1 = styles[0].getText().getFill(),
+					textFill2 = styles[1].getText().getFill();
 
-			textFill.setColor('rgba(255, 204, 51, 0.8)');
-			strokeStyle.setColor('rgba(255, 204, 51, 0.8)');
+			var yellowColor = 'rgba(255, 204, 51, 0.8)';
+			textFill1.setColor(yellowColor);
+			textFill2.setColor(yellowColor);
+			strokeStyle.setColor(yellowColor);
 			strokeStyle.setLineDash(null);
 		},
 
 		onFeatureChange: function(evt) {
 			var feature = evt.target,
 					geom = feature.getGeometry(),
-					measure = null;
+					measureMetric = null,
+					measureImperial = null;
 
 			if (geom instanceof ol.geom.Polygon) {
-				measure = this.formatArea(geom);
+				var areaSqrMeter = this.calculateArea(geom);
+				measureMetric = this.formatAreaMetric(areaSqrMeter);
+				measureImperial = this.formatAreaImperial(areaSqrMeter);
 			} else if (geom instanceof ol.geom.LineString) {
-				measure = this.formatLength(geom);
+				var lengthMeter = this.calculateLength(geom);
+				measureMetric = this.formatLengthMetric(lengthMeter);
+				measureImperial = this.formatLengthImperial(lengthMeter);
 			}
 
-			if (measure) {
-				feature.getStyle().getText().setText(measure);
+			var styles = feature.getStyle();
+			if (measureImperial) {
+				styles[0].getText().setText(measureImperial);
+			}
+			
+			if (measureMetric) {
+				var txt = styles[1].getText();
+				txt.setText(measureMetric);
+				txt.setOffsetY(18);
 			}
 		},
 
-		formatLength: function(line) {
-			var length = 0;
+		calculateLength: function(line) {
+			var lengthMeter = 0;
 			var sourceProj = Core.Ext.Map.getMap().getView().getProjection();
 			var coordinates = line.getCoordinates();
 			for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
 				var c1 = ol.proj.transform(coordinates[i], sourceProj, 'EPSG:4326');
 				var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
-				length += this.wgs84Sphere.haversineDistance(c1, c2);
+				lengthMeter += this.wgs84Sphere.haversineDistance(c1, c2);
 			}
-			var output;
-			if (length > 100) {
-				output = (Math.round(length / 1000 * 100) / 100) + ' ' + 'km';
-			} else {
-				output = (Math.round(length * 100) / 100) + ' ' + 'm';
-			}
-			return output;
+			return lengthMeter;
 		},
 
-		formatArea: function(polygon) {
+		calculateArea: function(polygon) {
 			var sourceProj = Core.Ext.Map.getMap().getView().getProjection();
 			var geom = polygon.clone().transform(sourceProj, 'EPSG:4326');
 			var coordinates = geom.getLinearRing(0).getCoordinates();
-			var area = Math.abs(this.wgs84Sphere.geodesicArea(coordinates));
+			return Math.abs(this.wgs84Sphere.geodesicArea(coordinates));
+		},
 
-			var output;
-			if (area > 10000) {
-				output = (Math.round(area / 1000000 * 100) / 100) + ' ' + 'km²';
+		M_PER_KM: 1000,
+		formatLengthMetric: function(lengthMeter) {
+			if (lengthMeter > (this.M_PER_KM / 10)) {
+				return this.round(lengthMeter / this.M_PER_KM) + ' km';
 			} else {
-				output = (Math.round(area * 100) / 100) + ' ' + 'm²';
+				return this.round(lengthMeter) + ' m';
 			}
-			return output;
+		},
+		
+		FEET_PER_METER: 3.28084,
+		FEET_PER_MILE: 5280,
+		formatLengthImperial: function(lengthMeter){
+			var lengthFeet = lengthMeter * this.FEET_PER_METER;
+			if (lengthFeet > (this.FEET_PER_MILE / 10)) {
+				return this.round(lengthFeet / this.FEET_PER_MILE) + ' mi';
+			} else {
+				return this.round(lengthFeet) + ' ft';
+			}
+		},
+
+		SQRM_PER_SQRKM: 1000000,
+		formatAreaMetric: function(areaSqrMeter) {
+			if (areaSqrMeter > (this.SQRM_PER_SQRKM / 10)) {
+				return this.round(areaSqrMeter / this.SQRM_PER_SQRKM) + ' km²';
+			} else {
+				return this.round(areaSqrMeter) + ' m²';
+			}
+		},
+		
+		SQRFEET_PER_SQRMETER: 10.7639,
+		SQRFEET_PER_ACRE: 43560,
+		formatAreaImperial: function(areaSqrMeter){
+			var areaSqrFeet = areaSqrMeter * this.SQRFEET_PER_SQRMETER;
+			if (areaSqrFeet > (this.SQRFEET_PER_ACRE / 10)) {
+				return this.round(areaSqrFeet / this.SQRFEET_PER_ACRE) + ' acres';
+			} else {
+				return this.round(areaSqrFeet) + ' ft²';
+			}
+		},
+
+		round: function(value) {
+			return (Math.round(value * 100) / 100);
 		},
 
 		getDefaultMeasureStyle: function () {
 			return new ol.style.Style({
-				text: new ol.style.Text({
-					text: "",
-					testAlign: 'center',
-					fill: new ol.style.Fill({
-						color: 'rgb(255, 255, 255)'
-					}),
-					stroke: new ol.style.Stroke({
-						color: 'rgb(0, 0, 0)',
-						width: 2
-					}),
-					scale: 1.5,
-					font: '12px arial'
-				}),
+				text: this.getDefaultTextStyle(),
 				fill: new ol.style.Fill({
 					color: 'rgba(255, 255, 255, 0.2)'
 				}),
@@ -211,6 +247,28 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 						color: 'rgba(255, 255, 255, 0.2)'
 					})
 				})
+			});
+		},
+		
+		getDefaultMeasureTextStyle: function () {
+			return new ol.style.Style({
+				text: this.getDefaultTextStyle()
+			});
+		},
+		
+		getDefaultTextStyle: function () {
+			return new ol.style.Text({
+				text: "",
+				textAlign: 'center',
+				fill: new ol.style.Fill({
+					color: 'rgb(255, 255, 255)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: 'rgb(0, 0, 0)',
+					width: 2
+				}),
+				scale: 1.5,
+				font: '12px arial'
 			});
 		}
 	});

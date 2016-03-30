@@ -1,6 +1,6 @@
 // OpenLayers 3. See http://openlayers.org/
 // License: https://raw.githubusercontent.com/openlayers/ol3/master/LICENSE.md
-// Version: v3.11.2
+// Version: v3.11.2-2-g6b9bf96
 
 (function (root, factory) {
   if (typeof exports === "object") {
@@ -98099,7 +98099,7 @@ ol.format.KML.IconStyleParser_ = function(node, objectStack) {
     anchorOrigin: ol.style.IconOrigin.BOTTOM_LEFT,
     anchorXUnits: anchorXUnits,
     anchorYUnits: anchorYUnits,
-    crossOrigin: 'anonymous', // FIXME should this be configurable?
+    //crossOrigin: 'anonymous', // FIXME should this be configurable?
     offset: offset,
     offsetOrigin: ol.style.IconOrigin.BOTTOM_LEFT,
     rotation: rotation,
