@@ -28,164 +28,133 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define(['ext', 'iweb/CoreModule'], function(Ext, Core){
-	
+
 	return Ext.define('map.ClickListener', {
-		
+
 		constructor: function(renderers) {
 			this.renderers = renderers;
 			this.activeFeature = null;
-			this.activeSource
-			
-			this.container = new Ext.panel.Panel({
+
+			this.container = new Ext.window.Window({
 				title: 'Feature Details',
 				width: 400,
 				componentCls:'form-feature-detail',
-				renderTo: Ext.getBody()
+				renderTo: "cMainComponent-body",
+				closeAction: 'hide',
+				listeners: {
+					close: this.onWindowClose,
+					scope: this
+				}
 			});
-			this.addCloseTool();
-			
-			this.overlay = Core.Ext.Map.getDetailOverlay();
-			this.overlay.setElement(this.container.getEl().dom);
 
 			//we listen to the select event so we get click details
+			this.olMap = Core.Ext.Map.getMap();
+			this.olMap.on("moveend", this.onMapMoveEnd, this);
+
 			var select = Core.Ext.Map.getSelectInteraction();
 			select.on("select", this.onMapViewSelect.bind(this));
-			//
-			Core.EventManager.addListener("map-view-click", this.onMapViewClick.bind(this));
+
 			Core.EventManager.addListener("map-source-set", this.onMapSourceSet.bind(this));
-			Core.EventManager.addListener("map-window-clear", this.onMapWindowClear.bind(this));
-			
+
 			this.bufferedRender = Ext.Function.createBuffered(this.render, 100, this);
 		},
-		
+
 		addRenderer: function(renderer) {
 			this.renderers.push(renderer);
 		},
-		
-		onMapWindowClear: function(evt) {
-			this.cleanup();
-		},
-		
+
 		onWindowClose: function() {
 			this.cleanup();
 		},
-		
-		/**
-		 * Keep track of the last map click location so we can pin our pop-up there
-		 * 
-		 * NOTE: as of OL3.6, the select event will pass along the mapBrowserEvent
-		 * for click details so we can get all the info we need in the select event
-		 */
-		onMapViewClick: function(eventName, evt) {
-			this.lastClickCoord = evt.coordinate;
-		},
-		
+
 		onMapViewSelect: function(evt) {
+			this.lastClickCoord = evt.mapBrowserEvent.coordinate;
 			var features = evt.selected;
-			
+
 			var handled = false;
 			if (features.length) {
 				this.activeFeature = features[0];
-				
-				//make overlay visible first for accurate layout
-				this.overlay.setPosition(this.lastClickCoord);
-				
+
+				this.container.show();
+				this.container.setLocalXY(
+					this.olMap.getPixelFromCoordinate(this.lastClickCoord));
+
 				handled = this.render(this.activeFeature);
 			}
-			
+
 			if (!handled) {
 				this.cleanup();
 			}
 		},
-		
+
 		onMapSourceSet: function(eventName, oldSource, source) {
 			this.unlistenToSource(oldSource);
-			
+
 			//clear the overlay on source change (i.e. change rooms)
 			this.cleanup();
-			
+
 			this.listenToSource(source);
 		},
-		
+
 		listenToSource: function(source) {
 			if(source){
 				source.on('removefeature', this.onRemoveFeature, this);
 				source.on('changefeature', this.onChangeFeature, this);
 			}
 		},
-		
+
 		unlistenToSource: function(source) {
 			if(source){
 				source.un('removefeature', this.onRemoveFeature, this);
 				source.un('changefeature', this.onChangeFeature, this);
 			}
 		},
-		
+
 		cleanup: function() {
 			//setting position undefined hides the overlay
-			this.overlay.setPosition(undefined);
+			this.container.hide();
 			this.container.removeAll();
 			this.activeFeature = null;
 		},
-		
+
 		onRemoveFeature: function(event) {
 			if (event.feature == this.activeFeature) {
 				this.cleanup();
 			}
 		},
-		
+
 		onChangeFeature: function(event) {
 			if (event.feature == this.activeFeature) {
 				this.bufferedRender(this.activeFeature);
-				
-				var pt = event.feature.getGeometry().getClosestPoint(
-							this.overlay.getPosition());
-				this.overlay.setPosition(pt);
+
+
+				this.lastClickCoord = event.feature.getGeometry()
+					.getClosestPoint(this.container.getXY());
+				this.container.setLocalXY(
+					this.olMap.getPixelFromCoordinate(this.lastClickCoord));
 			}
 		},
-		
-		addCloseTool: function() {
-			var useDelegatedEvents = Ext.dom.Element.useDelegatedEvents;
-			Ext.dom.Element.useDelegatedEvents = false;
-			
-			this.container.addTool({
-				xtype : 'tool',
-				type: 'close',
-				scope: this,
-				handler: this.onWindowClose
-			});
-			
-			Ext.dom.Element.useDelegatedEvents = useDelegatedEvents;
+
+		onMapMoveEnd: function() {
+			if (this.activeFeature) {
+				this.container.setLocalXY(
+					this.olMap.getPixelFromCoordinate(this.lastClickCoord));
+			}
 		},
-		
+
 		render: function(feature) {
-			/* Note:
-			 * during rendering, we want to disable delegated events.
-			 * This is because the Openlayers Overlay container we are in will
-			 * stop all of our events from propagating to the map, so we need to
-			 * handle all the events directly on the elements. */
-			var useDelegatedEvents = Ext.dom.Element.useDelegatedEvents;
-			Ext.dom.Element.useDelegatedEvents = false;
-			
-			
 			//clear the container before rendering
 			this.container.removeAll();
-			
-			
-			var handled = this.delegateRender(this.container, feature)
-			
-			//reset delegated events value
-			Ext.dom.Element.useDelegatedEvents = useDelegatedEvents;
-			
-			return handled;
+
+			return this.delegateRender(this.container, feature)
 		},
-		
+
 		delegateRender: function(container, feature) {
 			return this.renderers.reduce(function(prev, curr, idx, arr){
-				return curr.render.call(curr, container, feature) || prev; 
+				return curr.render.call(curr, container, feature) || prev;
 			}, false);
 		}
-		
+
 	});
 
 });

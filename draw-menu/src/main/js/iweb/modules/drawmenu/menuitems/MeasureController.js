@@ -95,11 +95,12 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 		},
 
 		buildMeasureInteraction: function (type) {
-			var interaction = new ol.interaction.Draw({
-				type: type,
-				source: this.getLayer().getSource(),
-				style: this.getDefaultMeasureStyle()
-			});
+			var method = (type === "LineString") ?
+						Interactions.drawLine : Interactions.drawPolygon;
+			var interaction = method(
+				this.getLayer().getSource(),
+				this.getDefaultMeasureStyle()
+			);
 
 			interaction.on("drawstart", this.onDrawStart.bind(this));
 			interaction.on("drawend", this.onDrawEnd.bind(this));

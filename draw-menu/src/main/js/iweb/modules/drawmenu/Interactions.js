@@ -32,17 +32,12 @@ define(['ol'], function(ol) {
     return {
     	selectBox: function(map, selectedCollection) {
 
-    		var lastMapBrowserEvent = null;
     		var box = new ol.interaction.DragBox({
-                  condition: function(mapBrowserEvent) {
-                	  //cache last map event for handling later
-                	  lastMapBrowserEvent = mapBrowserEvent;
-                	  return true;
-                  }
+                  boxEndCondition: ol.events.condition.always
     		});
     		
             box.on("boxend", function(e) {
-                if (!ol.events.condition.shiftKeyOnly(lastMapBrowserEvent)) {
+                if (!ol.events.condition.shiftKeyOnly(e.mapBrowserEvent)) {
                     selectedCollection.clear();
                 }
 
@@ -68,13 +63,13 @@ define(['ol'], function(ol) {
             });
             
             box.on("boxstart", function(e) {
-            	var target = lastMapBrowserEvent.map.getTarget();
+            	var target = e.mapBrowserEvent.map.getTarget();
            		Ext.get(target).addCls("ol-drawbox");
     		});
     		
             box.on("boxend", function(e) {
-    			var target = lastMapBrowserEvent.map.getTarget();
-    			Ext.get(target).removeCls("ol-drawbox");
+              var target = e.mapBrowserEvent.map.getTarget();
+              Ext.get(target).removeCls("ol-drawbox");
             });
             
             return [box];
@@ -82,24 +77,23 @@ define(['ol'], function(ol) {
     	},
     	
     	zoomBox: function() {
-    		var lastMapBrowserEvent = null;
     		var zoom = new ol.interaction.DragZoom({
-                condition: function(mapBrowserEvent) {
-              	  //cache last map event for handling later
-              	  lastMapBrowserEvent = mapBrowserEvent;
-              	  return true;
-                }
+          condition: ol.events.condition.always,
+          boxEndCondition: function(mapBrowserEvent, startPixel, endPixel) {
+            var target = mapBrowserEvent.map.getTarget();
+            Ext.get(target).removeCls("ol-drawbox");
+
+            //we repeat the default dragbox condition
+            var width = endPixel[0] - startPixel[0];
+            var height = endPixel[1] - startPixel[1];
+            return width * width + height * height >= (64);
+          }
 		    });
     		
             zoom.on("boxstart", function(e) {
-            	var target = lastMapBrowserEvent.map.getTarget();
+            	var target = e.mapBrowserEvent.map.getTarget();
            		Ext.get(target).addCls("ol-drawbox");
     		});
-    		
-            zoom.on("boxend", function(e) {
-            	var target = lastMapBrowserEvent.map.getTarget();
-    			Ext.get(target).removeCls("ol-drawbox");
-            });
     		
     		return [zoom];
     	},
@@ -113,13 +107,8 @@ define(['ol'], function(ol) {
     		});
             var selectedCollection = select.getFeatures();
 
-    		var lastMapBrowserEvent = null;
     		var box = new ol.interaction.DragBox({
-                  condition: function(mapBrowserEvent) {
-                	  //cache last map event for handling later
-                	  lastMapBrowserEvent = mapBrowserEvent;
-                	  return true;
-                  }
+          boxEndCondition: ol.events.condition.always
     		});
 
             //when a box is drawn, add any intersecting features to selection
@@ -137,12 +126,12 @@ define(['ol'], function(ol) {
             }, 10));
     		
             box.on("boxstart", function(e) {
-            	var target = lastMapBrowserEvent.map.getTarget();
+            	var target = e.mapBrowserEvent.map.getTarget();
            		Ext.get(target).addCls("ol-drawbox");
     		});
     		
             box.on("boxend", function(e) {
-            	var target = lastMapBrowserEvent.map.getTarget();
+            	var target = e.mapBrowserEvent.map.getTarget();
     			Ext.get(target).removeCls("ol-drawbox");
             });
     		
@@ -183,7 +172,11 @@ define(['ol'], function(ol) {
     		    	}
     		    	return (typeof style === "function") ? style(feature, resolution) : style;
     		    },
-    		    type: /** @type {ol.geom.GeometryType} */ ('Polygon')
+    		    type: /** @type {ol.geom.GeometryType} */ ('Polygon'),
+    		    //allows drag with mouseup to immediately finish feature
+    		    clickTolerance: Number.POSITIVE_INFINITY,
+    		    condition: ol.events.condition.singleClick,
+    		    freehandCondition: ol.events.condition.noModifierKeys
     		});
 
     		return draw;
@@ -193,7 +186,11 @@ define(['ol'], function(ol) {
     		var draw = new ol.interaction.Draw({
     		    source: source,
     		    style: style,
-    		    type: /** @type {ol.geom.GeometryType} */ ('LineString')
+    		    type: /** @type {ol.geom.GeometryType} */ ('LineString'),
+    		    //allows drag with mouseup to immediately finish feature
+    		    clickTolerance: Number.POSITIVE_INFINITY,
+    		    condition: ol.events.condition.singleClick,
+    		    freehandCondition: ol.events.condition.noModifierKeys
     		});
     		
     		return draw;

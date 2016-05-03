@@ -42,7 +42,7 @@ public class Config {
 	private Configuration config;
 	private RabbitMQEndpoint endpoint;
 	
-	private String ROUTING_KEY = "iweb.#";
+	private static final String DEFAULT_ROUTING_KEY = "iweb.#";
 
     public static final String RABBIT_HOSTNAME_KEY = "rabbitmq.hostname";
     public static final String RABBIT_PORT_KEY = "rabbitmq.port";
@@ -51,7 +51,7 @@ public class Config {
     public static final String RABBIT_EXCHANGENAME_KEY = "rabbitmq.exchange.name";
     public static final String RABBIT_MAX_CONN_TRIES = "rabbitmq.maxconntries";
     public static final String RABBIT_FAILOVER_HOSTNAME = "rabbitmq.failover.hostname";
-    public static final String RABBIT_BINDING_KEYS = "rabbitmq.bindingkeys";
+    public static final String RABBIT_ROUTING_KEY = "rabbitmq.routingkey";
     public static final String RABBIT_MSG_VERSION = "rabbitmq.msgver";
 	
 	// Lazy-initialization Holder class idiom.
@@ -87,7 +87,7 @@ public class Config {
 		endpoint.setUsername(config.getString(RABBIT_USERNAME_KEY));
 		endpoint.setPassword(config.getString(RABBIT_USERPWD_KEY));
 		endpoint.setExchangeType("topic");
-		endpoint.setRoutingKey(ROUTING_KEY);
+		endpoint.setRoutingKey(config.getString(RABBIT_ROUTING_KEY, DEFAULT_ROUTING_KEY));
 		endpoint.setExchangeName(config.getString(RABBIT_EXCHANGENAME_KEY));
 	}
 	

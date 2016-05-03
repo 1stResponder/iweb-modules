@@ -122,7 +122,7 @@ define(["ext", "jquery", "iweb/modules/core-view/ConnectionIndicator"],
         
         Viewer.prototype.setMainContentComponent = function(component) {
             this.mainContentPanel.add(component);
-            this.mainContentPanel.doLayout();
+            //this.mainContentPanel.doLayout();
         };
 
         Viewer.prototype.getMainContentComponent = function() {
@@ -161,12 +161,12 @@ define(["ext", "jquery", "iweb/modules/core-view/ConnectionIndicator"],
 
         Viewer.prototype.addToTitleBar = function(components) {
             this.titleBar.add(components);
-            this.titleBar.doLayout();
+           // this.titleBar.doLayout();
         };
 
         Viewer.prototype.addButtonPanel = function(buttonPanel) {
             this.buttonBar.add(buttonPanel);
-            this.buttonBar.doLayout();
+            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.insertButtonPanel = function(index, buttons) {
@@ -178,12 +178,12 @@ define(["ext", "jquery", "iweb/modules/core-view/ConnectionIndicator"],
             } else {
                 this.buttonBar.insert(index, buttons);
             }
-            this.buttonBar.doLayout();
+            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.removeButtonFromPanel = function(button) {
             this.buttonBar.remove(button);
-            this.buttonBar.doLayout();
+            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.showToolbar = function(show) {

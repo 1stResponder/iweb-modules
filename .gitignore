@@ -16,6 +16,12 @@ release.properties
 *.swp
 *.swo
 
+<<<<<<< HEAD
 # intellij 
 *.iml
 .idea/
+=======
+# intellij
+.idea/
+*.iml
+>>>>>>> feature/publish

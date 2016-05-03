@@ -275,6 +275,32 @@ define(["iweb/CoreModule", "ol", "./MapStyle", "./FilteredCollection"],
 	MapController.prototype.getMap = function(){
 		return this.view.map;
 	};
+	
+	MapController.prototype.reloadLayer = function(layer){
+		if(layer){
+			var source = layer.getSource();
+			
+			var deferReload = source.get("deferReload");
+			if (deferReload) {
+				var features = source.getFeatures();
+				source.clear();
+				source.addFeatures(features);
+			} else if(source && source.getParams){
+				var params = source.getParams();
+				if(!params){ params = {}; }
+				if(params.LAYERS && 
+						params.LAYERS.indexOf("show") > -1){
+					//Refresh ArcGis differently
+					source.setTileLoadFunction(source.getTileLoadFunction());
+				}else{
+					params.updated = (new Date()).getTime();
+					source.updateParams(params);
+				}
+			}else if(source && source.clear){
+				source.clear();
+			}
+		}
+	};
 
 	return MapController;
 });
