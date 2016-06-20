@@ -34,6 +34,7 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 		constructor: function(renderers) {
 			this.renderers = renderers;
 			this.activeFeature = null;
+			this.activeFeatures = null;
 
 			this.container = new Ext.window.Window({
 				title: 'Feature Details',
@@ -44,7 +45,21 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 				listeners: {
 					close: this.onWindowClose,
 					scope: this
-				}
+				},
+				tbar: [{
+					itemId: 'previous',
+					text: 'Previous',
+					iconCls: Ext.baseCSSPrefix + 'tbar-page-prev',
+					handler: "onPreviousClicked",
+					scope: this
+				},"->",{
+					itemId: 'next',
+					text: 'Next',
+					iconCls: Ext.baseCSSPrefix + 'tbar-page-next',
+					iconAlign: 'right',
+					handler: "onNextClicked",
+					scope: this
+				}]
 			});
 
 			//we listen to the select event so we get click details
@@ -69,22 +84,61 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 
 		onMapViewSelect: function(evt) {
 			this.lastClickCoord = evt.mapBrowserEvent.coordinate;
+			var px = this.olMap.getPixelFromCoordinate(this.lastClickCoord);
 			var features = evt.selected;
 
 			var handled = false;
 			if (features.length) {
 				this.activeFeature = features[0];
 
+				//get any other clicked features
+				var clickedFeatures = this.getFeaturesAtPixel(px);
+				if (clickedFeatures.length > 1) {
+					this.activeFeatures = clickedFeatures;
+
+					//show/enable toolbar
+					this.container.getDockedItems()[1].show();
+				} else {
+					//hide/disable toolbar
+					this.container.getDockedItems()[1].hide();
+				}
+
 				this.container.show();
-				this.container.setLocalXY(
-					this.olMap.getPixelFromCoordinate(this.lastClickCoord));
+				this.container.setLocalXY(px);
 
 				handled = this.render(this.activeFeature);
+			}else{
+				Core.EventManager.fireEvent("iweb.map.view.select", evt, this.container);
 			}
 
 			if (!handled) {
 				this.cleanup();
 			}
+		},
+
+		onPreviousClicked: function() {
+			var idx = this.activeFeatures.indexOf(this.activeFeature);
+			var newIdx = (idx - 1);
+			if (newIdx < 0) {
+				newIdx = (this.activeFeatures.length - 1);
+			}
+
+			this.activeFeature = this.activeFeatures[newIdx];
+			this.render(this.activeFeature);
+
+			select.getFeatures().clear();
+			select.getFeatures().push(this.activeFeature);
+		},
+
+		onNextClicked: function() {
+			var idx = this.activeFeatures.indexOf(this.activeFeature);
+			var newIdx = (idx + 1) % this.activeFeatures.length;
+
+			this.activeFeature = this.activeFeatures[newIdx];
+			this.render(this.activeFeature);
+
+			select.getFeatures().clear();
+			select.getFeatures().push(this.activeFeature);
 		},
 
 		onMapSourceSet: function(eventName, oldSource, source) {
@@ -115,9 +169,18 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 			this.container.hide();
 			this.container.removeAll();
 			this.activeFeature = null;
+			this.activeFeatures = null;
 		},
 
 		onRemoveFeature: function(event) {
+			if (this.activeFeatures) {
+				var idx = this.activeFeatures.indexOf(this.activeFeature);
+				if (idx >= 0) {
+					this.cleanup();
+					return;
+				}
+			}
+			
 			if (event.feature == this.activeFeature) {
 				this.cleanup();
 			}
@@ -146,13 +209,21 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 			//clear the container before rendering
 			this.container.removeAll();
 
-			return this.delegateRender(this.container, feature)
+			return this.delegateRender(this.container, feature);
 		},
 
 		delegateRender: function(container, feature) {
 			return this.renderers.reduce(function(prev, curr, idx, arr){
 				return curr.render.call(curr, container, feature) || prev;
 			}, false);
+		},
+
+		getFeaturesAtPixel: function(px) {
+			var features = [];
+			this.olMap.forEachFeatureAtPixel(px, function(feature, layer){
+				features.push(feature);
+			});
+			return features;
 		}
 
 	});

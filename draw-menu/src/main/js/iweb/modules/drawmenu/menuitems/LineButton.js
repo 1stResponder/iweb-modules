@@ -79,6 +79,11 @@ define(["iweb/CoreModule", "./LineController"], function(Core) { //Add shape opt
 					iconCls: "sprite-pencil_thick",
 					reference: "thick",
 					handler: "onThickClick"
+				},{
+					tooltip: "Draw Dashed Line",
+					icon: "images/drawmenu/pencil-dash.png",
+					reference: "dashed",
+					handler: "onDashedClick"
 				}]
 			}
 	       

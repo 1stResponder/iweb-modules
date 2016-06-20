@@ -31,15 +31,35 @@ define(["ol", "./ZoomLevelIndicator"], function(ol, ZoomLevelIndicator) {
 
 	var Viewer = function(){};
 
+	/**
+	 * Returns the modulo of a / b, depending on the sign of b.
+	 */
+	var modulo = function(a, b) {
+	  var r = a % b;
+	  return r * b < 0 ? r + b : r;
+	};
+
+	var degreesToDM = function(decimalDegrees, opt_fractionDigits){
+		var normalizedDegrees = modulo(decimalDegrees + 180, 360) - 180;
+		var absDegrees = Math.abs(normalizedDegrees);
+		var degrees = Math.floor(absDegrees);
+		var minutes = (60 * (absDegrees - degrees));
+		if (normalizedDegrees < 0) {
+			degrees *= -1;
+		}
+		return degrees + '\u00b0 '
+			+ minutes.toFixed(opt_fractionDigits) + '\u2032';
+	};
+
 	Viewer.prototype.setMap = function(containerComponent, lat, lon, zoom){
         /**
          * Create an overlay to anchor the popup to the map.
          */
         this.popupOverlay = new ol.Overlay({ stopEvent: true });
-        
+
         /***************************************************/
 		var el = containerComponent.body.dom;
-		
+
 		this.map = new ol.Map({
 			layers: [
 				new ol.layer.Tile({
@@ -51,20 +71,32 @@ define(["ol", "./ZoomLevelIndicator"], function(ol, ZoomLevelIndicator) {
 					collapsible: false
 				})
 			}).extend([
-				new ZoomLevelIndicator()
+				new ZoomLevelIndicator(),
+				new ol.control.MousePosition({
+					projection: 'EPSG:4326',
+					coordinateFormat: function(coord) {
+						if (coord && coord.length) {
+							return 'Lon, Lat: '
+							 + degreesToDM(coord[0], 4)
+							 + ', '
+							 + degreesToDM(coord[1], 4);
+						}
+						return '';
+					}
+				})
 			]),
 			target: el,
 			overlays: [this.popupOverlay],
 			view: new ol.View({
-				center: [lat, lon], 
+				center: [lat, lon],
 				zoom: zoom,
-				
+
 				minZoom: 4,
 				maxZoom: 20
 			})
 	    });
-		
-		
+
+
 		containerComponent.on('resize', function() {
 			this.map.updateSize();
 		}, this);

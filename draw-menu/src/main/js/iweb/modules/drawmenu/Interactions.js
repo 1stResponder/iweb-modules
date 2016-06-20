@@ -173,8 +173,8 @@ define(['ol'], function(ol) {
     		    	return (typeof style === "function") ? style(feature, resolution) : style;
     		    },
     		    type: /** @type {ol.geom.GeometryType} */ ('Polygon'),
-    		    //allows drag with mouseup to immediately finish feature
-    		    clickTolerance: Number.POSITIVE_INFINITY,
+    		    clickTolerance: 1.4,
+    		    snapTolerance: 1.5,
     		    condition: ol.events.condition.singleClick,
     		    freehandCondition: ol.events.condition.noModifierKeys
     		});
@@ -187,8 +187,8 @@ define(['ol'], function(ol) {
     		    source: source,
     		    style: style,
     		    type: /** @type {ol.geom.GeometryType} */ ('LineString'),
-    		    //allows drag with mouseup to immediately finish feature
-    		    clickTolerance: Number.POSITIVE_INFINITY,
+    		    clickTolerance: 1.4,
+    		    snapTolerance: 1.5,
     		    condition: ol.events.condition.singleClick,
     		    freehandCondition: ol.events.condition.noModifierKeys
     		});

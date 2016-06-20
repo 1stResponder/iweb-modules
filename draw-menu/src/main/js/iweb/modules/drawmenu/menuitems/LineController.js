@@ -89,16 +89,25 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			this.getView().toggle(true);
 		},
 
-		buildLineInteraction: function (strokeWidth) {
+		onDashedClick: function(btn) {
+
+			this.selectedInteraction = this.buildLineInteraction(3, true);
+			Core.Ext.Map.setInteractions([this.selectedInteraction]);
+
+			this.updateButton(this.getView(), btn);
+			this.getView().toggle(true);
+		},
+
+		buildLineInteraction: function (strokeWidth, dashed) {
 			var interaction = Interactions.drawLine(
 				Core.Ext.Map.getSource(), Core.Ext.Map.getStyle);
 
-			interaction.on("drawstart", this.onDrawStart.bind(this, strokeWidth));
+			interaction.on("drawstart", this.onDrawStart.bind(this, strokeWidth, dashed));
 			interaction.on("drawend", this.onDrawEnd.bind(this));
 			return interaction;
 		},
 
-		onDrawStart: function(strokeWidth, drawEvent) {
+		onDrawStart: function(strokeWidth, dashed, drawEvent) {
 
 			var feature = drawEvent.feature;
 			feature.setProperties({
@@ -106,6 +115,11 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 				strokeWidth: strokeWidth,
 				strokeColor: this.drawingColor
 			});
+			if (dashed) {
+				feature.setProperties({
+					dashStyle: 'dashed'
+				});
+			}
 			this.featureInProgress = feature;
 		},
 
@@ -128,7 +142,8 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			}
 
 			var strokeColor = feature.get("strokeColor"),
-				strokeWidth = feature.get("strokeWidth");
+				strokeWidth = feature.get("strokeWidth"),
+				dashStyle = feature.get("dashStyle");
 
 			if (selected) {
 				strokeColor = "aqua";
@@ -139,6 +154,10 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			var stroke = style.getStroke();
 			stroke.setColor(strokeColor);
 			stroke.setWidth(strokeWidth);
+			
+			if (dashStyle === "dashed") {
+				stroke.setLineDash([12, 12]);
+			}
 
 			return [style];
 		},

@@ -90,7 +90,7 @@ define(["ext", "jquery", "atmosphere", "./EventManager", "./CookieManager"],
 		};
  	
  		request.onError = function(error){
- 			var error = "error";
+ 			_mediator.onDisconnect();
  		};
  		
  		request.onClose = function(error){
