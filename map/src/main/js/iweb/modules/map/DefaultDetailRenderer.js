@@ -75,6 +75,7 @@ define(['ext', 'ol', 'iweb/CoreModule'], function(Ext, ol, Core){
 				if (desc) {
 					var desc = new Ext.form.field.Display({
 						fieldLabel: 'Description',
+						labelAlign: 'top',
 						value: desc
 					});
 					container.add( desc );

@@ -52,6 +52,7 @@ public class Config {
     public static final String RABBIT_MAX_CONN_TRIES = "rabbitmq.maxconntries";
     public static final String RABBIT_FAILOVER_HOSTNAME = "rabbitmq.failover.hostname";
     public static final String RABBIT_ROUTING_KEY = "rabbitmq.routingkey";
+    public static final String RABBIT_BINDING_KEYS = "rabbitmq.bindingkeys";
     public static final String RABBIT_MSG_VERSION = "rabbitmq.msgver";
 	
 	// Lazy-initialization Holder class idiom.

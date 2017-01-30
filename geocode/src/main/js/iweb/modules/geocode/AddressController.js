@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define(['ext', 'ol', "iweb/modules/MapModule", "./AbstractController",
-		"async!https://maps.googleapis.com/maps/api/js"], 
+		"async!https://maps.googleapis.com/maps/api/js?key=YOUR_KEY"], 
 	function(Ext, ol, MapModule, AbstractController, Interactions){
 	
 		return Ext.define('modules.geocode.AddressController', {
@@ -37,13 +37,16 @@ define(['ext', 'ol', "iweb/modules/MapModule", "./AbstractController",
 			alias: 'controller.geocode.addresscontroller',
 			
 			onSearchClick: function() {
-				var address = this.getView().getAddressInput().getValue();
-				
+
+				var addressInput = this.getView().getAddressInput().getValue();
+
 				var geocoder = new google.maps.Geocoder();
-				geocoder.geocode({'address': address}, this.geocodeCallback.bind(this));
+				geocoder.geocode({'address': addressInput}, this.geocodeCallback.bind(this));
+
 			},
 			
 			geocodeCallback: function(results, status) {
+
 				if (status === google.maps.GeocoderStatus.OK) {
 					var loc = results[0].geometry.location;
 					var viewport = results[0].geometry.viewport;
@@ -84,7 +87,7 @@ define(['ext', 'ol', "iweb/modules/MapModule", "./AbstractController",
 				var geocoder = new google.maps.Geocoder();
 				geocoder.geocode({'location': {'lat': coord[1], 'lng': coord[0]}},
 						this.reverseGeocodeCallback.bind(this, feature));
-				
+
 				var controller = MapModule.getMapController();
 				controller.setInteractions(controller.getDefaultInteractions());
 			},

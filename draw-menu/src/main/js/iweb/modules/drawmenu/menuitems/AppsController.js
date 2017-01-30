@@ -70,7 +70,7 @@ define(["ol", "iweb/CoreModule", "../Interactions", "./AppsWindow"], function(ol
 			});
 			var coordParam = fmtdCoords.join(",");
 			
-			this.submitForm("POST", "http://ejscreen.epa.gov/mapper/demogreportpdf.aspx", {
+			this.submitForm("POST", "https://ejscreen.epa.gov/mapper/demogreportpdf.aspx", {
 				report: "acs2012",
 				coords: coordParam,
 				feattype: 'polygon',

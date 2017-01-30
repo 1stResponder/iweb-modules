@@ -150,23 +150,15 @@ define(["ext", "jquery", "iweb/modules/core-view/ConnectionIndicator"],
          * 				title parameter, or else the tab will be titled... what? TODO:
          */
         Viewer.prototype.addToSidePanel = function(component) {
-        	if(!component) {
-        		if(console) {
-        			console.log("Component passed to Core.View.addToSidePanel is undefined; not adding.");
-        		}
-        		return;
-        	}
         	this.sidePanel.add(component);
         };
 
         Viewer.prototype.addToTitleBar = function(components) {
             this.titleBar.add(components);
-           // this.titleBar.doLayout();
         };
 
         Viewer.prototype.addButtonPanel = function(buttonPanel) {
             this.buttonBar.add(buttonPanel);
-            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.insertButtonPanel = function(index, buttons) {
@@ -178,12 +170,10 @@ define(["ext", "jquery", "iweb/modules/core-view/ConnectionIndicator"],
             } else {
                 this.buttonBar.insert(index, buttons);
             }
-            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.removeButtonFromPanel = function(button) {
             this.buttonBar.remove(button);
-            //this.buttonBar.doLayout();
         };
 
         Viewer.prototype.showToolbar = function(show) {

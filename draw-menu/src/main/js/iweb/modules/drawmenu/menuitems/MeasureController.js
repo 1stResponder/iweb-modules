@@ -38,6 +38,7 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			this.updateButton(this.getView(), defaultTool);
 			defaultTool.toggle(true, true);
 			this.measureMode = "LineString";
+			this.measureUnits = "imperial";
 
 			this.wgs84Sphere = new ol.Sphere(6378137);
 		},
@@ -94,6 +95,12 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			this.getView().toggle(true);
 		},
 
+		onUnitsCheckChange: function(checkItem, checked, eOpts) {
+			if (checked) {
+				this.measureUnits = checkItem.units;
+			}
+		},
+
 		buildMeasureInteraction: function (type) {
 			var method = (type === "LineString") ?
 						Interactions.drawLine : Interactions.drawPolygon;
@@ -112,27 +119,20 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			feature.setProperties({
 				type: 'measure'
 			});
-			feature.setStyle([
-				this.getDefaultMeasureStyle(),
-				this.getDefaultMeasureTextStyle()
-			]);
-			feature.on("change",
-				this.onFeatureChange, this);
+			feature.setStyle(this.getDefaultMeasureStyle());
+			feature.on("change", this.onFeatureChange, this);
 		},
 
 		onDrawEnd: function (drawEvent) {
 			var feature = drawEvent.feature;
-			feature.un("change",
-				this.onFeatureChange, this);
+			feature.un("change", this.onFeatureChange, this);
 
-			var styles = feature.getStyle(),
-					strokeStyle = styles[0].getStroke(),
-					textFill1 = styles[0].getText().getFill(),
-					textFill2 = styles[1].getText().getFill();
+			var style = feature.getStyle(),
+					strokeStyle = style.getStroke(),
+					textFill = style.getText().getFill();
 
 			var yellowColor = 'rgba(255, 204, 51, 0.8)';
-			textFill1.setColor(yellowColor);
-			textFill2.setColor(yellowColor);
+			textFill.setColor(yellowColor);
 			strokeStyle.setColor(yellowColor);
 			strokeStyle.setLineDash(null);
 		},
@@ -140,28 +140,18 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 		onFeatureChange: function(evt) {
 			var feature = evt.target,
 					geom = feature.getGeometry(),
-					measureMetric = null,
-					measureImperial = null;
+					measure = null;
 
 			if (geom instanceof ol.geom.Polygon) {
 				var areaSqrMeter = this.calculateArea(geom);
-				measureMetric = this.formatAreaMetric(areaSqrMeter);
-				measureImperial = this.formatAreaImperial(areaSqrMeter);
+				measure = this.formatArea(areaSqrMeter);
 			} else if (geom instanceof ol.geom.LineString) {
 				var lengthMeter = this.calculateLength(geom);
-				measureMetric = this.formatLengthMetric(lengthMeter);
-				measureImperial = this.formatLengthImperial(lengthMeter);
-			}
-
-			var styles = feature.getStyle();
-			if (measureImperial) {
-				styles[0].getText().setText(measureImperial);
+				measure = this.formatLength(lengthMeter);
 			}
 			
-			if (measureMetric) {
-				var txt = styles[1].getText();
-				txt.setText(measureMetric);
-				txt.setOffsetY(18);
+			if (measure) {
+				feature.getStyle().getText().setText(measure);
 			}
 		},
 
@@ -184,6 +174,19 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			return Math.abs(this.wgs84Sphere.geodesicArea(coordinates));
 		},
 
+		formatLength: function(lengthMeter) {
+			switch (this.measureUnits) {
+				case "metric":
+					return this.formatLengthMetric(lengthMeter);
+				case "nautical":
+					return this.formatLengthNautical(lengthMeter);
+				case "imperial":
+					//interntional fallthrough
+				default:
+					return this.formatLengthImperial(lengthMeter);
+			}
+		},
+
 		M_PER_KM: 1000,
 		formatLengthMetric: function(lengthMeter) {
 			if (lengthMeter > (this.M_PER_KM / 10)) {
@@ -201,6 +204,25 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 				return this.round(lengthFeet / this.FEET_PER_MILE) + ' mi';
 			} else {
 				return this.round(lengthFeet) + ' ft';
+			}
+		},
+		
+		METER_PER_NM: 1852,
+		formatLengthNautical: function(lengthMeter){
+			var lengthNM = lengthMeter / this.METER_PER_NM;
+			return this.round(lengthNM) + ' nmi';
+		},
+
+		formatArea: function(areaSqrMeter) {
+			switch (this.measureUnits) {
+				case "metric":
+					return this.formatAreaMetric(areaSqrMeter);
+				case "nautical":
+					return this.formatAreaNautical(areaSqrMeter);
+				case "imperial":
+					//interntional fallthrough
+				default:
+					return this.formatAreaImperial(areaSqrMeter);
 			}
 		},
 
@@ -222,6 +244,12 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "ol"],
 			} else {
 				return this.round(areaSqrFeet) + ' ft²';
 			}
+		},
+
+		SQRMETER_PER_SQRNM: 3429904,
+		formatAreaNautical: function(areaSqrMeter){
+			var areaNM = areaSqrMeter / this.SQRMETER_PER_SQRNM;
+			return this.round(areaNM) + ' nmi²';
 		},
 
 		round: function(value) {

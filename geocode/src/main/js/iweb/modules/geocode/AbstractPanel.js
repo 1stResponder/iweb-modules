@@ -31,7 +31,7 @@
 	 
 	return Ext.define('modules.geocode.AbstractPanel', {
 		extend: 'Ext.panel.Panel',
-		
+
 		config: {
 			layout: {
 				type: 'vbox',

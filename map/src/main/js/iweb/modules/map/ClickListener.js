@@ -51,14 +51,16 @@ define(['ext', 'iweb/CoreModule'], function(Ext, Core){
 					text: 'Previous',
 					iconCls: Ext.baseCSSPrefix + 'tbar-page-prev',
 					handler: "onPreviousClicked",
-					scope: this
+					scope: this,
+					flex: 1
 				},"->",{
 					itemId: 'next',
 					text: 'Next',
 					iconCls: Ext.baseCSSPrefix + 'tbar-page-next',
 					iconAlign: 'right',
 					handler: "onNextClicked",
-					scope: this
+					scope: this,
+					flex: 1
 				}]
 			});
 

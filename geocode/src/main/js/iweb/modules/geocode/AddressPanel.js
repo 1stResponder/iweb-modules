@@ -32,7 +32,7 @@
 	 
 	return Ext.define('modules.geocode.AddressPanel', {
 		extend: 'modules.geocode.AbstractPanel',
-		
+	
 		controller: 'geocode.addresscontroller',
 		
 		title: 'Address / Placemark',

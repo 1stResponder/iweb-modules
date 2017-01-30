@@ -51,9 +51,7 @@ define(["iweb/CoreModule", "./MeasureController"], function(Core) {
 
 				referenceHolder: true,
 
-				layout: {
-						type: 'vbox'
-				},
+				layout: {type: 'vbox', align: 'stretch'},
 
 				defaults: {
 					xtype: 'button',
@@ -73,6 +71,30 @@ define(["iweb/CoreModule", "./MeasureController"], function(Core) {
 					iconCls: "sprite-ruler-crop",
 					reference: "area",
 					handler: "onAreaClick"
+				},{
+					xtype: 'menuitem',
+					text: 'Units',
+					icon: null, //override the default
+					menu: {
+						
+						defaults: {
+							xtype: 'menucheckitem',
+							group: 'measure-units',
+							checkHandler: "onUnitsCheckChange"
+						},
+						
+						items:[{
+							text: 'Imperial',
+							units: 'imperial',
+							checked: true
+						}, {
+							text: 'Metric',
+							units: 'metric'
+						}, {
+							text: 'Nautical',
+							units: 'nautical'
+						}]
+					}
 				}]
 			}
 	});

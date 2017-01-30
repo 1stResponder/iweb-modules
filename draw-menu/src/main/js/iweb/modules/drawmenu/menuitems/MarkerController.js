@@ -87,14 +87,14 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./Marke
 				return;
 			}
 
-			var graphic = feature.get("graphic"),
+			var graphic = feature.get("graphic") || "images/drawmenu/markers/default_marker.png",
 				rotation = feature.get("rotation") || 0;
 
 			var style = this.buildDefaultMarkerStyle(graphic);
 			style.getImage().setRotation(rotation);
 
 			if (selected) {
-				var graphicWidth = feature.get("graphicWidth"),
+				var graphicWidth = feature.get("graphicWidth") || 32,
 					selectedStyle = this.buildSelectedMarkerStyle();
 
 				return [selectedStyle, style];

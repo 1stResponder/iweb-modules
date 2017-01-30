@@ -58,9 +58,13 @@ public class RabbitBroadcastFilter implements PerRequestBroadcastFilter {
 	@Override
 	public BroadcastAction filter(String broadcasterId, AtmosphereResource r, Object originalMessage, Object message){
 		try{
+
+			@SuppressWarnings("unchecked")
 			ResponseMessage response = ((ResponseMessage) originalMessage);
 			
+			@SuppressWarnings("unchecked")
 			List<String> topics = (List<String>) r.getRequest().getSession().getAttribute("topics");
+			
 			String topic = response.getEventName();
 			
 			if(findMatch(topics,topic)){

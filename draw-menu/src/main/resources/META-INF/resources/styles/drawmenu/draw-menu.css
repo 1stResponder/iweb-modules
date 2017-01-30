@@ -29,9 +29,9 @@
  */
 .marker-window div.x-panel-body span {
 	display: inline-block;
-	height: 28px;
-	width: 28px;
-	line-height: 28px;
+	height: 48px;
+	width: 48px;
+	line-height: 58px;
 	border: 1px solid lightgrey;
 	text-align: center;
 	padding: 1px;

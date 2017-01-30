@@ -28,57 +28,57 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define(["iweb/CoreModule"], function(Core) {
-    return Ext.define(null, {
-       extend: 'Ext.app.ViewController',
-       
-       clipboard: [],
-       
-       readOnly: false,
-       
-       init: function() {
-    	  Core.EventManager.addListener("map-source-set", this.onMapSourceSet.bind(this));
-    	  Core.EventManager.addListener("map-selection-change", this.onMapSelectionChange.bind(this));
-       },
-       
-       onCopyClick: function() {
-    	   this.clipboard = Core.Ext.Map.getEditableSelection().getArray().slice();
-    	   this.disablePaste(this.readOnly);
-       },
-       
-       onPasteClick: function() {
-    	   
-    	   var clones = this.clipboard.map(function(f) {
-    		   var clone = f.clone();
-    		   clone.setId(undefined);
-    		   clone.unset("featureId");
-    		   return clone;
-    	   });
-    	   Core.Ext.Map.getSource().addFeatures(clones);
-    	   
-    	   var selectCollection = Core.Ext.Map.getSelection();
-    	   selectCollection.clear();
-    	   selectCollection.extend(clones);
-       },
-       
-       onMapSelectionChange: function(eventName, selection) {
-         //use the editable selection rather than passed selection
-         var editableSelection = Core.Ext.Map.getEditableSelection().getArray();
-    	   this.lookupReference("copy").setDisabled(!editableSelection.length);
-       },
-       
-       onMapSourceSet: function(eventName, oldSource, newSource){
-    	   this.readOnly = (newSource == null);
-    	   if(!this.readOnly && this.clipboard.length > 0){
-    		   this.disablePaste(false);
-    	   }else{
-    		   this.disablePaste(true);
-    	   }
-       },
-       
-       disablePaste: function(disable){
-    	   this.lookupReference("paste").setDisabled(disable);
-       }
-       
-    });
+		return Ext.define(null, {
+			 extend: 'Ext.app.ViewController',
+			 
+			 clipboard: [],
+			 
+			 readOnly: false,
+			 
+			 init: function() {
+				Core.EventManager.addListener("map-source-set", this.onMapSourceSet.bind(this));
+				Core.EventManager.addListener("map-selection-change", this.onMapSelectionChange.bind(this));
+			 },
+			 
+			 onCopyClick: function() {
+				 this.clipboard = Core.Ext.Map.getEditableSelection().getArray().slice();
+				 this.disablePaste(this.readOnly);
+			 },
+			 
+			 onPasteClick: function() {
+				 
+				 var clones = this.clipboard.map(function(f) {
+					 var clone = f.clone();
+					 clone.setId(undefined);
+					 clone.unset("featureId");
+					 return clone;
+				 });
+				 Core.Ext.Map.getSource().addFeatures(clones);
+				 
+				 var selectCollection = Core.Ext.Map.getSelection();
+				 selectCollection.clear();
+				 selectCollection.extend(clones);
+			 },
+			 
+			 onMapSelectionChange: function(eventName, selection) {
+				 //use the editable selection rather than passed selection
+				 var editableSelection = Core.Ext.Map.getEditableSelection().getArray();
+				 this.lookupReference("copy").setDisabled(!editableSelection.length);
+			 },
+			 
+			 onMapSourceSet: function(eventName, oldSource, newSource){
+				 this.readOnly = (newSource == null);
+				 if(!this.readOnly && this.clipboard.length > 0){
+					 this.disablePaste(false);
+				 }else{
+					 this.disablePaste(true);
+				 }
+			 },
+			 
+			 disablePaste: function(disable){
+				 this.lookupReference("paste").setDisabled(disable);
+			 }
+			 
+		});
 
 });
