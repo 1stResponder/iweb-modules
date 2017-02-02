@@ -6,6 +6,8 @@ Integrated Web Extensible Bundle (IWEB) JavaScript Extensible Modules (JEMs) pro
 
     mvn install
 
+    Before Building you will need to add a Google geocoder tool api key to AddressController.js.
+
 ## Description of Modules
   - core :
     - Server-side Mediator : The server-side Mediator automatically establishes a connection to RabbitMQ running on the localhost. It will listen on the "iweb.#" topic.
