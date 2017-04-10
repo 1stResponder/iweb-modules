@@ -78,7 +78,8 @@ define(["iweb/CoreModule", "iweb/modules/MapModule", "../Interactions", "./Marke
 				graphic: img,
 				graphicHeight: height,
 				graphicWidth: width,
-				description: description
+				description: description,
+				graphicurl: window.location.hostname + "/upload/" + img
 			});
 		},
 
